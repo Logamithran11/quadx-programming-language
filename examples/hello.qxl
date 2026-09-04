@@ -1,0 +1,7 @@
+// ─── Hello World ───
+// The simplest QXL program
+
+start
+    show "Hello, World!"
+    show "Welcome to QuadX Programming Language!"
+end

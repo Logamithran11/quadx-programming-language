@@ -1,0 +1,24 @@
+// ─── Fibonacci Sequence ───
+// Generates the first N Fibonacci numbers
+
+start
+    show "─── Fibonacci Sequence ───"
+
+    number n = 10
+    number a = 0
+    number b = 1
+    number count = 0
+
+    repeat count < n
+        show a
+        number temp = a + b
+        a = b
+        b = temp
+        count = count + 1
+    endrepeat
+
+    show ""
+    show "─── Fibonacci Check ───"
+    show "10th Fibonacci number:"
+    show a
+end

@@ -1,0 +1,18 @@
+# QuadX Programming Language (QXL) — Dependencies
+# Python 3.12+
+
+# Web Framework
+Flask==3.1.1
+Flask-CORS==5.0.1
+
+# Compiler Tools
+ply==3.11
+
+# Visualization
+graphviz==0.20.3
+
+# Testing
+pytest==8.3.4
+
+# Utilities
+watchdog==6.0.0

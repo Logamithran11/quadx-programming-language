@@ -1,0 +1,39 @@
+// ─── Calculator ───
+// Demonstrates arithmetic operations and variables
+
+start
+    // Variable declarations
+    number a = 100
+    number b = 25
+
+    // Arithmetic operations
+    number sum = a + b
+    number diff = a - b
+    number product = a * b
+    number quotient = a / b
+    number remainder = a % b
+
+    // Display results
+    show "─── QXL Calculator ───"
+    show "a = 100, b = 25"
+    show ""
+    show "Addition:"
+    show sum
+    show "Subtraction:"
+    show diff
+    show "Multiplication:"
+    show product
+    show "Division:"
+    show quotient
+    show "Modulus:"
+    show remainder
+
+    // Decimal arithmetic
+    decimal pi = 3.14159
+    decimal radius = 5.0
+    decimal area = pi * radius * radius
+    show ""
+    show "─── Circle Area ───"
+    show "Area of circle with radius 5:"
+    show area
+end

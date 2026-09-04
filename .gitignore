@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+env/
+
+# QXL generated files
+.generated/
+.graph/
+generated/
+graph/
+
+# Development
+scratch/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Graphviz test files
+test_dot.png
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# VS Code / IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,46 @@
+// ─── Loop Example ───
+// Demonstrates repeat loops, break, and continue
+
+start
+    // Count from 1 to 5
+    show "─── Counting 1 to 5 ───"
+    number i = 1
+    repeat i <= 5
+        show i
+        i = i + 1
+    endrepeat
+
+    // Sum of first 10 numbers
+    show ""
+    show "─── Sum of 1 to 10 ───"
+    number total = 0
+    number counter = 1
+    repeat counter <= 10
+        total = total + counter
+        counter = counter + 1
+    endrepeat
+    show "Sum:"
+    show total
+
+    // Loop with break
+    show ""
+    show "─── Loop with break at 3 ───"
+    number j = 1
+    repeat j <= 10
+        if j == 4
+            break
+        endif
+        show j
+        j = j + 1
+    endrepeat
+
+    // Multiplication table for 5
+    show ""
+    show "─── 5x Table ───"
+    number k = 1
+    repeat k <= 5
+        number result = 5 * k
+        show result
+        k = k + 1
+    endrepeat
+end

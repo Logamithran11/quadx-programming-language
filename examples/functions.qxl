@@ -1,0 +1,74 @@
+// ─── Functions Demo ───
+// Demonstrates function declarations, parameters, return, and calls
+
+start
+    // Function: Add two numbers
+    function add(number a, number b)
+        return a + b
+    endfunction
+
+    // Function: Maximum of two numbers
+    function max(number a, number b)
+        if a > b
+            return a
+        otherwise
+            return b
+        endif
+    endfunction
+
+    // Function: Absolute value
+    function absolute(number x)
+        if x < 0
+            return -x
+        endif
+        return x
+    endfunction
+
+    // Function: Power (base^exp using loop)
+    function power(number base, number exp)
+        number result = 1
+        number i = 0
+        repeat i < exp
+            result = result * base
+            i = i + 1
+        endrepeat
+        return result
+    endfunction
+
+    // Function: Check if even
+    function isEven(number n)
+        number remainder = n % 2
+        if remainder == 0
+            return true
+        otherwise
+            return false
+        endif
+    endfunction
+
+    // ─── Function Calls ───
+    show "─── Function Demos ───"
+
+    show "add(15, 27) ="
+    show add(15, 27)
+
+    show "max(42, 17) ="
+    show max(42, 17)
+
+    show "absolute(-99) ="
+    show absolute(-99)
+
+    show "power(2, 8) ="
+    show power(2, 8)
+
+    show "isEven(42) ="
+    show isEven(42)
+
+    show "isEven(7) ="
+    show isEven(7)
+
+    // Nested function calls
+    show ""
+    show "─── Nested Calls ───"
+    show "add(max(3,5), power(2,3)) ="
+    show add(max(3, 5), power(2, 3))
+end

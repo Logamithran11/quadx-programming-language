@@ -1,0 +1,24 @@
+// ─── Factorial ───
+// Computes factorial using a function with recursion-like loop
+
+start
+    // Factorial function using a loop
+    function factorial(number n)
+        number result = 1
+        number i = 1
+        repeat i <= n
+            result = result * i
+            i = i + 1
+        endrepeat
+        return result
+    endfunction
+
+    // Calculate factorials
+    show "─── Factorials ───"
+    show "5! ="
+    show factorial(5)
+    show "7! ="
+    show factorial(7)
+    show "10! ="
+    show factorial(10)
+end
