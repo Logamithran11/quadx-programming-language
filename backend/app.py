@@ -272,7 +272,7 @@ def generate_tree_image(ast_node: Any, filename: str = "parse_tree") -> Optional
 
     add_node(ast_node)
     
-    return "\\n".join(lines)
+    return "\n".join(lines)
 
 
 # ═════════════════════════════════════════════════════════════
