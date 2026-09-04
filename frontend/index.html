@@ -306,8 +306,13 @@
     <!-- Monaco Editor -->
     <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs/loader.js"></script>
 
-    <!-- Mermaid.js for Visualizations -->
-    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.8.0/dist/mermaid.min.js"></script>
+    <!-- Mermaid.js for Visualizations (ESM module) -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10.8.0/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: false, theme: 'dark', securityLevel: 'loose', maxTextSize: 100000 });
+        window.mermaid = mermaid;
+        window.dispatchEvent(new CustomEvent('mermaid-loaded'));
+    </script>
 
     <!-- QXL IDE Scripts -->
     <script src="theme.js"></script>

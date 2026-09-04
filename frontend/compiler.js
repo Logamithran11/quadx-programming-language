@@ -11,6 +11,29 @@ const QXLCompiler = (() => {
     let lastResult = null;
     let statsChart = null;
 
+    /**
+     * Wait for Mermaid.js to be available (loaded via ESM module in index.html).
+     * Resolves immediately if already loaded, otherwise waits for the custom event.
+     */
+    function waitForMermaid() {
+        if (window.mermaid) {
+            return Promise.resolve(window.mermaid);
+        }
+        return new Promise((resolve, reject) => {
+            const timeout = setTimeout(() => {
+                reject(new Error('Mermaid.js failed to load within 15 seconds'));
+            }, 15000);
+            window.addEventListener('mermaid-loaded', () => {
+                clearTimeout(timeout);
+                if (window.mermaid) {
+                    resolve(window.mermaid);
+                } else {
+                    reject(new Error('Mermaid event fired but window.mermaid is still undefined'));
+                }
+            }, { once: true });
+        });
+    }
+
     // ═════════════════════════════════════════════════════════
     // API CALLS
     // ═════════════════════════════════════════════════════════
@@ -130,17 +153,11 @@ const QXLCompiler = (() => {
             </div>`;
             return;
         }
-        
-        if (typeof mermaid === 'undefined') {
-            console.error("Mermaid Parse Tree Error: Mermaid.js is undefined (CDN failed to load).");
-            container.innerHTML = `<div class="alert alert-danger">Failed to render parse tree visualization (Mermaid library not loaded).</div>`;
-            return;
-        }
-        
+
         try {
-            mermaid.initialize({ startOnLoad: false, theme: 'dark', maxTextSize: 100000 });
-            const id = 'parseTree_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
-            const { svg } = await mermaid.render(id, mermaidStr);
+            const mermaidLib = await waitForMermaid();
+            const id = 'qxl_parse_tree_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
+            const { svg } = await mermaidLib.render(id, mermaidStr);
             container.innerHTML = `<div class="tree-container" style="background:#1e1e2e; padding:20px; border-radius:10px; overflow:auto;">${svg}</div>`;
         } catch (error) {
             console.error("Mermaid Parse Tree Error:", error);
@@ -173,17 +190,10 @@ const QXLCompiler = (() => {
         container.innerHTML = html;
         
         if (mermaidStr) {
-            if (typeof mermaid === 'undefined') {
-                console.error("Mermaid AST Error: Mermaid.js is undefined (CDN failed to load).");
-                const mermaidContainer = document.getElementById('ast-mermaid-container');
-                if (mermaidContainer) {
-                    mermaidContainer.innerHTML = `<div class="alert alert-danger">Failed to render AST visualization (Mermaid library not loaded).</div>`;
-                }
-                return;
-            }
             try {
-                const id = 'astGraph_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
-                const { svg } = await mermaid.render(id, mermaidStr);
+                const mermaidLib = await waitForMermaid();
+                const id = 'qxl_ast_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
+                const { svg } = await mermaidLib.render(id, mermaidStr);
                 const mermaidContainer = document.getElementById('ast-mermaid-container');
                 if (mermaidContainer) {
                     mermaidContainer.innerHTML = svg;
