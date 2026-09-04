@@ -225,7 +225,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const code = QXLEditor.getValue();
 
         try {
-            const response = await fetch('http://localhost:5000/programs', {
+            const response = await fetch('/programs', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name, code }),
@@ -390,11 +390,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function checkServerConnection() {
         const statusEl = document.getElementById('status-connection');
         try {
-            await fetch('http://localhost:5000/tokens', { method: 'GET' });
+            await fetch('/tokens', { method: 'GET' });
             statusEl.innerHTML = '<i class="bi bi-circle-fill status-dot connected"></i> Connected';
         } catch {
             statusEl.innerHTML = '<i class="bi bi-circle-fill status-dot disconnected"></i> Disconnected';
-            logConsole('⚠ Backend server not detected at localhost:5000', 'warning');
+            logConsole('⚠ Backend server not responding', 'warning');
             logConsole('  Run: python backend/app.py', 'info');
         }
     }

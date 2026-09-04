@@ -31,7 +31,7 @@ import time
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-from flask import Flask, jsonify, request, send_file
+from flask import Flask, jsonify, request, send_file, send_from_directory
 from flask_cors import CORS
 import sys
 
@@ -61,6 +61,18 @@ CORS(app)
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 EXAMPLES_DIR = os.path.join(PROJECT_ROOT, "examples")
 DB_PATH = os.path.join(PROJECT_ROOT, ".qxl_database.db")
+FRONTEND_DIR = os.path.join(PROJECT_ROOT, "frontend")
+
+@app.route("/")
+def serve_frontend():
+    return send_from_directory(FRONTEND_DIR, "index.html")
+
+@app.route("/<path:path>")
+def serve_frontend_files(path):
+    file_path = os.path.join(FRONTEND_DIR, path)
+    if os.path.isfile(file_path):
+        return send_from_directory(FRONTEND_DIR, path)
+    return jsonify({"error": "Resource not found"}), 404
 
 # ── Compilation State (last compilation results) ────────────
 _state: Dict[str, Any] = {

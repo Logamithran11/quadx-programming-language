@@ -6,7 +6,7 @@
  */
 
 const QXLCompiler = (() => {
-    const API_BASE = 'http://localhost:5000';
+    const API_BASE = '';
 
     let lastResult = null;
     let statsChart = null;
