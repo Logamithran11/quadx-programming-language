@@ -131,13 +131,19 @@ const QXLCompiler = (() => {
             return;
         }
         
+        if (typeof mermaid === 'undefined') {
+            console.error("Mermaid Parse Tree Error: Mermaid.js is undefined (CDN failed to load).");
+            container.innerHTML = `<div class="alert alert-danger">Failed to render parse tree visualization (Mermaid library not loaded).</div>`;
+            return;
+        }
+        
         try {
             mermaid.initialize({ startOnLoad: false, theme: 'dark', maxTextSize: 100000 });
             const id = 'parseTree_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
             const { svg } = await mermaid.render(id, mermaidStr);
             container.innerHTML = `<div class="tree-container" style="background:#1e1e2e; padding:20px; border-radius:10px; overflow:auto;">${svg}</div>`;
-        } catch (e) {
-            console.error("Mermaid rendering failed:", e);
+        } catch (error) {
+            console.error("Mermaid Parse Tree Error:", error);
             container.innerHTML = `<div class="alert alert-danger">Failed to render parse tree visualization.</div>`;
         }
     }
@@ -167,6 +173,14 @@ const QXLCompiler = (() => {
         container.innerHTML = html;
         
         if (mermaidStr) {
+            if (typeof mermaid === 'undefined') {
+                console.error("Mermaid AST Error: Mermaid.js is undefined (CDN failed to load).");
+                const mermaidContainer = document.getElementById('ast-mermaid-container');
+                if (mermaidContainer) {
+                    mermaidContainer.innerHTML = `<div class="alert alert-danger">Failed to render AST visualization (Mermaid library not loaded).</div>`;
+                }
+                return;
+            }
             try {
                 const id = 'astGraph_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
                 const { svg } = await mermaid.render(id, mermaidStr);
@@ -174,8 +188,8 @@ const QXLCompiler = (() => {
                 if (mermaidContainer) {
                     mermaidContainer.innerHTML = svg;
                 }
-            } catch (e) {
-                console.error("Mermaid AST rendering failed:", e);
+            } catch (error) {
+                console.error("Mermaid AST rendering failed:", error);
                 const mermaidContainer = document.getElementById('ast-mermaid-container');
                 if (mermaidContainer) {
                     mermaidContainer.innerHTML = `<div class="alert alert-danger">Failed to render AST visualization.</div>`;

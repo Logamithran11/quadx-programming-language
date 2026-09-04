@@ -227,19 +227,27 @@ def generate_tree_image(ast_node: Any, filename: str = "parse_tree") -> Optional
         node_id = f"n{_counter[0]}"
         label = node.__class__.__name__.replace("Node", "")
 
+        def escape_label(text: str) -> str:
+            if not isinstance(text, str):
+                text = str(text)
+            text = text.replace("&", "&amp;")
+            text = text.replace("<", "&lt;")
+            text = text.replace(">", "&gt;")
+            text = text.replace('"', "&quot;")
+            return text
+
         # Add node-specific info to label
         if hasattr(node, "name") and isinstance(node.name, str) and node.name:
-            label += f"<br>{node.name}"
+            label += f"<br>{escape_label(node.name)}"
         if hasattr(node, "op") and isinstance(node.op, str) and node.op:
-            label += f"<br>[{node.op}]"
+            label += f"<br>[{escape_label(node.op)}]"
         if hasattr(node, "value") and isinstance(node.value, (int, float, str, bool)):
             val = str(node.value)
             if len(val) > 20:
                 val = val[:17] + "..."
-            val = val.replace('"', '&quot;')
-            label += f"<br>={val}"
+            label += f"<br>={escape_label(val)}"
         if hasattr(node, "var_type") and isinstance(node.var_type, str) and node.var_type:
-            label += f"<br>:{node.var_type}"
+            label += f"<br>:{escape_label(node.var_type)}"
 
         # Append node definition
         cls_name = node.__class__.__name__
