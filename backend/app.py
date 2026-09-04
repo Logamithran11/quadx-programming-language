@@ -185,7 +185,14 @@ def generate_tree_image(ast_node: Any, filename: str = "parse_tree") -> Optional
     """
     try:
         import graphviz
+        import shutil
+        import sys
+        import traceback
+        if not shutil.which("dot"):
+            print("Graphviz executable 'dot' not found in PATH.", file=sys.stderr)
+            return None
     except ImportError:
+        print("Python 'graphviz' package is missing.", file=sys.stderr)
         return None
 
     dot = graphviz.Digraph(
@@ -296,7 +303,9 @@ def generate_tree_image(ast_node: Any, filename: str = "parse_tree") -> Optional
         if os.path.exists(png_path):
             with open(png_path, "rb") as f:
                 return base64.b64encode(f.read()).decode("utf-8")
-    except Exception:
+    except Exception as e:
+        print(f"Graphviz rendering failed: {e}", file=sys.stderr)
+        traceback.print_exc()
         pass
 
     return None
