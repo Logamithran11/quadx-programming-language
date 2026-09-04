@@ -168,6 +168,13 @@ def _load_sample_programs(conn: sqlite3.Connection) -> None:
 
 
 # ═════════════════════════════════════════════════════════════
+# INITIALIZATION (Runs on import for Gunicorn compatibility)
+# ═════════════════════════════════════════════════════════════
+init_db()
+ensure_directory(get_generated_dir())
+ensure_directory(get_graph_dir())
+
+# ═════════════════════════════════════════════════════════════
 # GRAPHVIZ VISUALIZATION
 # ═════════════════════════════════════════════════════════════
 
@@ -610,12 +617,5 @@ if __name__ == "__main__":
     print("    QuadX Programming Language                  ")
     print("    http://localhost:5000                       ")
     print("================================================")
-
-    # Initialize database
-    init_db()
-
-    # Ensure directories exist
-    ensure_directory(get_generated_dir())
-    ensure_directory(get_graph_dir())
 
     app.run(debug=False, host="0.0.0.0", port=5000)

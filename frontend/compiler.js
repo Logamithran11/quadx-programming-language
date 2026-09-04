@@ -54,6 +54,9 @@ const QXLCompiler = (() => {
     async function loadExample(name) {
         try {
             const response = await fetch(`${API_BASE}/examples/${name}`);
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
             return await response.json();
         } catch (error) {
             throw new Error(`Failed to load example: ${error.message}`);
