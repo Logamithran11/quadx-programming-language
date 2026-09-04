@@ -9,9 +9,6 @@ gunicorn==23.0.0
 # Compiler Tools
 ply==3.11
 
-# Visualization
-graphviz==0.20.3
-
 # Testing
 pytest==8.3.4
 

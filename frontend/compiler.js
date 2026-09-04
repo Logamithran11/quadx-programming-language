@@ -118,42 +118,70 @@ const QXLCompiler = (() => {
     }
 
     /**
-     * Render the parse tree image or fallback.
+     * Render the Parse Tree natively using Mermaid.
      */
-    function renderParseTree(base64Image) {
+    async function renderParseTree(mermaidStr) {
         const container = document.getElementById('tab-parse-tree');
-        if (base64Image) {
-            container.innerHTML = `<div class="tree-image-container">
-                <img src="data:image/png;base64,${base64Image}" alt="Parse Tree">
+        if (!mermaidStr) {
+            container.innerHTML = `<div class="empty-state">
+                <i class="bi bi-diagram-3"></i>
+                <p>Parse tree visualization unavailable.</p>
+                <small class="text-muted">No visualization data returned.</small>
             </div>`;
-        } else {
-            container.innerHTML = '<div class="empty-state"><i class="bi bi-diagram-3"></i><p>Parse tree visualization requires Graphviz.<br>Install it for visual trees.</p></div>';
+            return;
+        }
+        
+        try {
+            mermaid.initialize({ startOnLoad: false, theme: 'dark', maxTextSize: 100000 });
+            const id = 'parseTree_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+            const { svg } = await mermaid.render(id, mermaidStr);
+            container.innerHTML = `<div class="tree-container" style="background:#1e1e2e; padding:20px; border-radius:10px; overflow:auto;">${svg}</div>`;
+        } catch (e) {
+            console.error("Mermaid rendering failed:", e);
+            container.innerHTML = `<div class="alert alert-danger">Failed to render parse tree visualization.</div>`;
         }
     }
 
     /**
-     * Render the AST as an interactive tree view.
+     * Render the AST as an interactive tree view with Mermaid visualization.
      */
-    function renderAST(ast, base64Image) {
+    async function renderAST(ast, mermaidStr) {
         const container = document.getElementById('tab-ast');
         if (!ast) {
             container.innerHTML = '<div class="empty-state"><i class="bi bi-tree"></i><p>No AST available</p></div>';
             return;
         }
 
-        // If we have an image, show both the image and JSON tree
+        // Create container for both HTML tree and SVG tree
         let html = '';
-        if (base64Image) {
-            html += `<div class="tree-image-container" style="max-height:400px;margin-bottom:16px;">
-                <img src="data:image/png;base64,${base64Image}" alt="AST">
+        if (mermaidStr) {
+            html += `<div id="ast-mermaid-container" style="max-height:400px;margin-bottom:16px;background:#1e1e2e;padding:10px;border-radius:8px;overflow:auto;">
+                <div class="spinner-border text-primary spinner-border-sm" role="status"></div> Loading visualization...
             </div>`;
         }
 
         html += '<div class="ast-tree">';
         html += renderASTNode(ast, 0);
         html += '</div>';
-
+        
         container.innerHTML = html;
+        
+        if (mermaidStr) {
+            try {
+                const id = 'astGraph_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+                const { svg } = await mermaid.render(id, mermaidStr);
+                const mermaidContainer = document.getElementById('ast-mermaid-container');
+                if (mermaidContainer) {
+                    mermaidContainer.innerHTML = svg;
+                }
+            } catch (e) {
+                console.error("Mermaid AST rendering failed:", e);
+                const mermaidContainer = document.getElementById('ast-mermaid-container');
+                if (mermaidContainer) {
+                    mermaidContainer.innerHTML = `<div class="alert alert-danger">Failed to render AST visualization.</div>`;
+                }
+            }
+        }
     }
 
     /**

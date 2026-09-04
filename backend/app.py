@@ -179,54 +179,47 @@ ensure_directory(get_graph_dir())
 # ═════════════════════════════════════════════════════════════
 
 def generate_tree_image(ast_node: Any, filename: str = "parse_tree") -> Optional[str]:
-    """Generate a tree visualization using Graphviz and return base64 PNG.
+    """Generate a tree visualization using Mermaid.js graph definition.
     
-    Falls back gracefully if Graphviz is not installed.
+    Returns a string containing the Mermaid graph definition natively without external binaries.
     """
-    try:
-        import graphviz
-        import shutil
-        import sys
-        import traceback
-        if not shutil.which("dot"):
-            print("Graphviz executable 'dot' not found in PATH.", file=sys.stderr)
-            return None
-    except ImportError:
-        print("Python 'graphviz' package is missing.", file=sys.stderr)
+    if ast_node is None:
         return None
 
-    dot = graphviz.Digraph(
-        comment="QXL Parse Tree",
-        format="png",
-        graph_attr={
-            "bgcolor": "#1e1e2e",
-            "fontcolor": "#cdd6f4",
-            "rankdir": "TB",
-            "splines": "ortho",
-            "nodesep": "0.6",
-            "ranksep": "0.8",
-        },
-        node_attr={
-            "style": "filled,rounded",
-            "fillcolor": "#313244",
-            "fontcolor": "#cdd6f4",
-            "fontname": "JetBrains Mono",
-            "fontsize": "12",
-            "shape": "box",
-            "penwidth": "0.5",
-            "color": "#585b70",
-        },
-        edge_attr={
-            "color": "#6c7086",
-            "arrowsize": "0.6",
-            "penwidth": "0.8",
-        },
-    )
+    lines = ["graph TD"]
+    
+    # Color coding by node type (matching original dark theme)
+    colors = {
+        "ProgramNode": "#89b4fa",
+        "FunctionDeclNode": "#a6e3a1",
+        "IfNode": "#f9e2af",
+        "RepeatNode": "#fab387",
+        "VarDeclNode": "#cba6f7",
+        "AssignNode": "#cba6f7",
+        "ShowNode": "#89dceb",
+        "ReadNode": "#89dceb",
+        "BinOpNode": "#f38ba8",
+        "ComparisonNode": "#f38ba8",
+        "LogicalNode": "#f38ba8",
+        "NumberLitNode": "#94e2d5",
+        "DecimalLitNode": "#94e2d5",
+        "StringLitNode": "#94e2d5",
+        "BoolLitNode": "#94e2d5",
+        "IdentifierNode": "#b4befe",
+        "FunctionCallNode": "#a6e3a1",
+        "ReturnNode": "#eba0ac",
+    }
+    
+    for cls, color in colors.items():
+        font_color = "#11111b" if color != "#313244" else "#cdd6f4"
+        lines.append(f"    classDef {cls} fill:{color},color:{font_color},stroke:#585b70,stroke-width:1px,rx:5px,ry:5px")
+        
+    lines.append(f"    classDef default fill:#313244,color:#cdd6f4,stroke:#585b70,stroke-width:1px,rx:5px,ry:5px")
 
     _counter = [0]
 
     def add_node(node: Any, parent_id: Optional[str] = None) -> str:
-        """Recursively add AST nodes to the Graphviz graph."""
+        """Recursively add AST nodes to the Mermaid graph."""
         if node is None:
             return ""
 
@@ -236,45 +229,25 @@ def generate_tree_image(ast_node: Any, filename: str = "parse_tree") -> Optional
 
         # Add node-specific info to label
         if hasattr(node, "name") and isinstance(node.name, str) and node.name:
-            label += f"\n{node.name}"
+            label += f"<br>{node.name}"
         if hasattr(node, "op") and isinstance(node.op, str) and node.op:
-            label += f"\n[{node.op}]"
+            label += f"<br>[{node.op}]"
         if hasattr(node, "value") and isinstance(node.value, (int, float, str, bool)):
             val = str(node.value)
             if len(val) > 20:
                 val = val[:17] + "..."
-            label += f"\n={val}"
+            val = val.replace('"', '&quot;')
+            label += f"<br>={val}"
         if hasattr(node, "var_type") and isinstance(node.var_type, str) and node.var_type:
-            label += f"\n:{node.var_type}"
+            label += f"<br>:{node.var_type}"
 
-        # Color coding by node type
-        colors = {
-            "ProgramNode": "#89b4fa",
-            "FunctionDeclNode": "#a6e3a1",
-            "IfNode": "#f9e2af",
-            "RepeatNode": "#fab387",
-            "VarDeclNode": "#cba6f7",
-            "AssignNode": "#cba6f7",
-            "ShowNode": "#89dceb",
-            "ReadNode": "#89dceb",
-            "BinOpNode": "#f38ba8",
-            "ComparisonNode": "#f38ba8",
-            "LogicalNode": "#f38ba8",
-            "NumberLitNode": "#94e2d5",
-            "DecimalLitNode": "#94e2d5",
-            "StringLitNode": "#94e2d5",
-            "BoolLitNode": "#94e2d5",
-            "IdentifierNode": "#b4befe",
-            "FunctionCallNode": "#a6e3a1",
-            "ReturnNode": "#eba0ac",
-        }
-        fill_color = colors.get(node.__class__.__name__, "#313244")
-        node_font_color = "#11111b" if fill_color != "#313244" else "#cdd6f4"
-
-        dot.node(node_id, label, fillcolor=fill_color, fontcolor=node_font_color)
+        # Append node definition
+        cls_name = node.__class__.__name__
+        style_class = cls_name if cls_name in colors else "default"
+        lines.append(f'    {node_id}["{label}"]:::{style_class}')
 
         if parent_id:
-            dot.edge(parent_id, node_id)
+            lines.append(f"    {parent_id} --> {node_id}")
 
         # Recurse into children
         for key, value in vars(node).items():
@@ -290,25 +263,8 @@ def generate_tree_image(ast_node: Any, filename: str = "parse_tree") -> Optional
         return node_id
 
     add_node(ast_node)
-
-    # Render to file
-    try:
-        graph_dir = get_graph_dir()
-        ensure_directory(graph_dir)
-        output_path = os.path.join(graph_dir, filename)
-        dot.render(output_path, cleanup=True)
-
-        # Read PNG and return as base64
-        png_path = output_path + ".png"
-        if os.path.exists(png_path):
-            with open(png_path, "rb") as f:
-                return base64.b64encode(f.read()).decode("utf-8")
-    except Exception as e:
-        print(f"Graphviz rendering failed: {e}", file=sys.stderr)
-        traceback.print_exc()
-        pass
-
-    return None
+    
+    return "\\n".join(lines)
 
 
 # ═════════════════════════════════════════════════════════════
